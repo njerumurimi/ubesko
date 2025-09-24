@@ -110,3 +110,38 @@ model ContactFormMessage {
   isRead                    Boolean         @default(false)
   repliedAt                 DateTime?
 }
+
+model Location {
+  id        Int      @id @default(autoincrement())
+  handle    String   @unique
+  name      String
+  latitude  Float
+  longitude Float
+  imageUrl  String?
+  featured  Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Car {
+  id               Int      @id @default(autoincrement())
+  handle           String   @unique
+  name             String
+  bodyStyle        String
+  powertrain       String
+  transmission     String
+  seats            Int
+  description      String
+  features         String[]   // array of text
+  rating           Decimal    @db.Decimal(2, 1)
+  reviewCount      Int
+  unlimitedMileage Boolean    @default(false)
+  imageUrl         String
+  pricePerDay      Decimal    @db.Decimal(10, 2)
+  currency         String     @default("usd")
+  priceId          String     @default("")
+  status           String     @default("active")
+  metadata         Json?
+  createdAt        DateTime   @default(now())
+  updatedAt        DateTime   @updatedAt
+}
