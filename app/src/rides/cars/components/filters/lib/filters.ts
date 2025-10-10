@@ -1,4 +1,4 @@
-import { SearchParams } from "@/lib/types"
+import { SearchParams } from "../../../../../lib/types"
 
 import { BodyStyle, Powertrain, SelectedFilters, Transmission } from "../types"
 

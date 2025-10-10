@@ -1,20 +1,18 @@
-import { SelectCar } from "@/db/schema"
-
-import { formatAmountForDisplay } from "@/lib/utils"
-import CldImage from "@/components/cld-image"
-import { AutomaticGearboxIcon } from "@/components/icons/automatic-gearbox"
-import { BatteryAutomotiveIcon } from "@/components/icons/battery-automotive"
-import { EngineIcon } from "@/components/icons/engine"
-import { FilledStarIcon } from "@/components/icons/filled-star"
-import { ManualGearboxIcon } from "@/components/icons/manual-gearbox"
-
+import { Car } from 'wasp/entities'
+import { formatAmountForDisplay } from "../../../lib/utils"
+import CldImage from "../../../components/cld-image"
+import { AutomaticGearboxIcon } from "../../../components/icons/automatic-gearbox"
+import { BatteryAutomotiveIcon } from "../../../components/icons/battery-automotive"
+import { EngineIcon } from "../../../components/icons/engine"
+import { FilledStarIcon } from "../../../components/icons/filled-star"
+import { ManualGearboxIcon } from "../../../components/icons/manual-gearbox"
 import { CarDetailsButton } from "./car-details-button"
 
 interface CarCardProps {
-    car: SelectCar
+    car: Car
 }
 
-export async function CarCard({ car }: CarCardProps) {
+export function CarCard({ car }: CarCardProps) {
     if (!car) {
         return null
     }

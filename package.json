@@ -1,8 +1,0 @@
-{
-  "dependencies": {
-    "@radix-ui/react-toast": "^1.2.15",
-    "date-fns": "^4.1.0",
-    "leaflet": "^1.9.4",
-    "react-leaflet": "^5.0.0"
-  }
-}

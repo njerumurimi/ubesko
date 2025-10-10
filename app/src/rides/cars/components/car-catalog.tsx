@@ -1,8 +1,9 @@
-import { getCars } from "@/db/queries/car-repository"
-
-import { SearchParams } from "@/lib/types"
-import { slugify } from "@/lib/utils"
-
+import {
+    useQuery,
+    getCars
+} from 'wasp/client/operations';
+import { SearchParams } from "../../../lib/types"
+import { slugify } from "../../../lib/utils"
 import { CarCard } from "./car-card"
 
 interface CarCatalogProps {
@@ -17,7 +18,7 @@ interface CarCatalogProps {
 }
 
 export default async function CarCatalog({ searchParams }: CarCatalogProps) {
-    const cars = await getCars()
+    const { data: cars, isLoading, error } = useQuery(getCars)
 
     const {
         [SearchParams.MIN_PRICE]: minPrice,
