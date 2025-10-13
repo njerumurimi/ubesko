@@ -1,4 +1,4 @@
-import { formatDateRangeForDisplay } from "@/lib/dates"
+import { formatDateRangeForDisplay } from "../../../lib/dates"
 
 export function BookDetails({
     checkinDate,

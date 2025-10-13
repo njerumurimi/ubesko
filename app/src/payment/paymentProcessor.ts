@@ -11,15 +11,31 @@ export interface CreateCheckoutSessionArgs {
   paymentPlan: PaymentPlan;
   prismaUserDelegate: PrismaClient['user'];
 }
-export interface FetchCustomerPortalUrlArgs { 
-  userId: string; 
-  prismaUserDelegate: PrismaClient['user']; 
+
+export interface CreateCarRentalCheckoutSessionArgs {
+  userId: string;
+  userEmail: string;
+  rentalDetails: {
+    carName: string;
+    dailyRate: number;
+    durationDays: number;
+    currency: string;
+    carId: number;
+  };
+  prismaUserDelegate: PrismaClient['user'];
+}
+
+export interface FetchCustomerPortalUrlArgs {
+  userId: string;
+  prismaUserDelegate: PrismaClient['user'];
 };
 
 export interface PaymentProcessor {
   id: 'stripe' | 'lemonsqueezy';
-  createCheckoutSession: (args: CreateCheckoutSessionArgs) => Promise<{ session: { id: string; url: string }; }>; 
+
+  createCheckoutSession: (args: CreateCheckoutSessionArgs) => Promise<{ session: { id: string; url: string }; }>;
   fetchCustomerPortalUrl: (args: FetchCustomerPortalUrlArgs) => Promise<string | null>;
+  createCarRentalCheckoutSession: (args: CreateCarRentalCheckoutSessionArgs) => Promise<{ session: { id: string; url: string } }>;
   webhook: PaymentsWebhook;
   webhookMiddlewareConfigFn: MiddlewareConfigFn;
 }

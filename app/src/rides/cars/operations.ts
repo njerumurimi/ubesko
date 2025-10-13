@@ -4,6 +4,8 @@ import type {
     GetCarByHandle,
     GetCars
 } from 'wasp/server/operations';
+import { ensureArgsSchemaOrThrowHttpError } from '../server/validation';
+import * as z from 'zod';
 
 export const getCars: GetCars<void, Car[]> = async (_args, context) => {
     if (!context.user) {
@@ -13,12 +15,18 @@ export const getCars: GetCars<void, Car[]> = async (_args, context) => {
     return context.entities.Car.findMany()
 }
 
-type GetCarByHandleArgs = { handle: string }
+const getCarByHandleInputSchema = z.object({
+    handle: z.string().nonempty(),
+});
 
-export const getCarByHandle: GetCarByHandle<GetCarByHandleArgs, Car | null> = async ({ handle }, context) => {
+type GetCarByHandleInput = z.infer<typeof getCarByHandleInputSchema>;
+
+export const getCarByHandle: GetCarByHandle<GetCarByHandleInput, Car> = async (rawArgs, context) => {
     if (!context.user) {
         throw new HttpError(401)
     }
+
+    const { handle } = ensureArgsSchemaOrThrowHttpError(getCarByHandleInputSchema, rawArgs);
 
     return context.entities.Car.findUnique({
         where: { handle },

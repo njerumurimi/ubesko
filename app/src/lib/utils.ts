@@ -5,6 +5,14 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
+export const constructUrlWithParams = (
+  pathname: string,
+  params: URLSearchParams
+): string => {
+  const queryString = params.toString()
+  return queryString ? `${pathname}?${queryString}` : pathname
+}
+
 export const slugify = (str: string): string =>
   str
     .trim() // Trim leading/trailing whitespace
@@ -12,6 +20,12 @@ export const slugify = (str: string): string =>
     .replace(/[^a-z0-9\s-]+/g, "") // Remove non-alphanumeric characters
     .replace(/\s+/g, "-") // Replace spaces with hyphens
     .replace(/-+/g, "-") // Replace multiple hyphens with a single one
+
+export const setCSSVariable = (name: string, value: string): void => {
+  if (typeof window !== "undefined") {
+    document.documentElement?.style.setProperty(name, value)
+  }
+}
 
 export const formatAmountForDisplay = (
   amount: number,

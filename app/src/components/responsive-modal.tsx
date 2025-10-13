@@ -1,7 +1,7 @@
 import { ReactNode } from "react"
 
-import { DESKTOP_MEDIA_QUERY } from "@/lib/constants"
-import { useMediaQuery } from "@/hooks/use-media-query"
+import { DESKTOP_MEDIA_QUERY } from "../lib/constants"
+import { useMediaQuery } from "../hooks/use-media-query"
 import {
   Dialog,
   DialogContent,
@@ -10,7 +10,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog"
+} from "./ui/dialog"
 import {
   Drawer,
   DrawerContent,
@@ -19,7 +19,7 @@ import {
   DrawerHeader,
   DrawerTitle,
   DrawerTrigger,
-} from "@/components/ui/drawer"
+} from "./ui/drawer"
 
 interface ResponsiveModalProps {
   open: boolean

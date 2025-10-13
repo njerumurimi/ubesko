@@ -1,7 +1,6 @@
 import { Dispatch, ReactNode, SetStateAction } from "react"
-
-import { Separator } from "@/components/ui/separator"
-
+import { Separator } from "../../../../components/ui/separator"
+import * as React from "react"
 import { BodyStyleFilters } from "./sections/body-style"
 import { PowertrainFilters } from "./sections/powertrain"
 import { PriceRangeFilters } from "./sections/price-range"

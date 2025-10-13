@@ -1,16 +1,14 @@
-import Image from "next/image"
-import Link from "next/link"
-import { carTypes } from "@/data/car-types"
-
-import { SearchParams } from "@/lib/types"
-import { Button } from "@/components/ui/button"
+import { Link } from 'react-router-dom';
+import { carTypes } from "../../data/car-types"
+import { SearchParams } from "../../lib/types"
+import { Button } from "../../components/ui/button"
 import {
     Carousel,
     CarouselContent,
     CarouselItem,
     CarouselNext,
     CarouselPrevious,
-} from "@/components/ui/carousel"
+} from "../../components/ui/carousel"
 
 export function BrowseCarTypes() {
     return (
@@ -37,12 +35,9 @@ export function BrowseCarTypes() {
                                                 asChild
                                             >
                                                 <Link
-                                                    href={{
-                                                        pathname: "/cars",
-                                                        query: {
-                                                            [SearchParams.BODY_STYLE]: slug,
-                                                        },
-                                                    }}
+                                                    to={`/cars?${new URLSearchParams({
+                                                        [SearchParams.BODY_STYLE]: slug,
+                                                    }).toString()}`}
                                                     className="absolute inset-0 z-20 size-full rounded-xl"
                                                 />
                                             </Button>
@@ -50,14 +45,11 @@ export function BrowseCarTypes() {
                                                 <span className="absolute left-2 top-2 z-10 inline-flex items-center justify-center rounded-2xl border border-neutral-200 bg-white px-2 py-1 text-[12px] font-semibold leading-none tracking-wide sm:px-3 sm:py-1.5 sm:text-[13px] md:left-2.5 md:top-2.5 md:tracking-normal lg:py-2 lg:text-[14px]">
                                                     {name}
                                                 </span>
-                                                <Image
+                                                <img
                                                     src={imageUrl}
                                                     alt={name}
-                                                    priority
-                                                    fill
-                                                    sizes="(max-width: 550px) 50vw, (max-width: 950px) 33vw, (max-width: 1280px) 25vw, 20vw"
-                                                    className="rounded-xl object-cover"
-                                                    placeholder="blur"
+                                                    loading="lazy"
+                                                    className="rounded-xl object-cover w-full h-full"
                                                 />
                                             </div>
                                         </CarouselItem>

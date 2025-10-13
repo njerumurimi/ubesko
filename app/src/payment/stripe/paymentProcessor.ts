@@ -1,6 +1,6 @@
 import type { PaymentPlanEffect } from '../plans';
 import type { CreateCheckoutSessionArgs, FetchCustomerPortalUrlArgs, PaymentProcessor } from '../paymentProcessor'
-import { fetchStripeCustomer, createStripeCheckoutSession } from './checkoutUtils';
+import { fetchStripeCustomer, createStripeCheckoutSession, createStripeCarRentalCheckoutSession } from './checkoutUtils';
 import { requireNodeEnvVar } from '../../server/utils';
 import { stripeWebhook, stripeMiddlewareConfigFn } from './webhook';
 
@@ -15,6 +15,57 @@ export const stripePaymentProcessor: PaymentProcessor = {
       customerId: customer.id,
       mode: paymentPlanEffectToStripeMode(paymentPlan.effect),
     });
+    await prismaUserDelegate.update({
+      where: {
+        id: userId
+      },
+      data: {
+        paymentProcessorUserId: customer.id
+      }
+    })
+    if (!stripeSession.url) throw new Error('Error creating Stripe Checkout Session');
+    const session = {
+      url: stripeSession.url,
+      id: stripeSession.id,
+    };
+    return { session };
+  },
+
+  createCarRentalCheckoutSession: async (
+    {
+      userId,
+      userEmail,
+      rentalDetails, // 👈 new: not a paymentPlan, but dynamic booking info
+      prismaUserDelegate,
+    }: {
+      userId: string;
+      userEmail: string;
+      rentalDetails: {
+        carId: number;
+        carName: string;
+        dailyRate: number;
+        durationDays: number;
+        currency: string;
+      };
+      prismaUserDelegate: any;
+    }
+  ) => {
+
+    const customer = await fetchStripeCustomer(userEmail);
+
+    // const totalAmount = rentalDetails.dailyRate * rentalDetails.durationDays;
+
+    // 🧾 Create dynamic Stripe Checkout session
+    const stripeSession = await createStripeCarRentalCheckoutSession({
+      customerId: customer.id,
+      userId, // 👈 added
+      carId: rentalDetails.carId, // 👈 optional metadata
+      carName: rentalDetails.carName,
+      dailyRate: rentalDetails.dailyRate,
+      durationDays: rentalDetails.durationDays,
+      currency: rentalDetails.currency,
+    });
+
     await prismaUserDelegate.update({
       where: {
         id: userId

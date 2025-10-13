@@ -1,32 +1,40 @@
-import { getCarBySlug } from "@/db/queries/car-repository"
-import { SignedIn, SignedOut } from "@clerk/nextjs"
 import { differenceInDays, isValid } from "date-fns"
-
+import {
+    useQuery,
+    getCarByHandle,
+    generateCarRentalCheckoutSession
+} from 'wasp/client/operations';
+import { useState } from 'react';
+import { useParams, useSearchParams } from 'react-router-dom'
 import { SearchParams } from "../../lib/types"
 import { Separator } from "../../components/ui/separator"
 import { ChevronLeftIcon } from "../../components/icons/chevron-left"
 import { LogoLink } from "../../components/logoLink"
+import { Button } from "../../components/ui/button"
 import { BackButton } from "./components/back-button"
 import { BookDetails } from "./components/book-details"
 import { CarDetails } from "./components/car-details"
-import { PaymentDetails } from "./components/payment-details"
 import { PriceDetails } from "./components/price-details"
+import { useAuth } from 'wasp/client/auth';
+import { AuthSection } from "./components/auth-section"
+import { useNavigate } from 'react-router-dom';
 
+export default function CarReservationPage() {
+    const { data: user, isLoading, error } = useAuth(); // Returns AuthUser | null
 
-interface CarReservationPageProps {
-    params: { slug: string }
-    searchParams: {
-        [SearchParams.CHECKIN]: string
-        [SearchParams.CHECKOUT]: string
-    }
-}
+    const { slug } = useParams<{ slug: string }>()
+    const [searchParams] = useSearchParams()
+    const checkin = searchParams.get(SearchParams.CHECKIN)
+    const checkout = searchParams.get(SearchParams.CHECKOUT)
 
-export default function CarReservationPage({
-    params,
-    searchParams,
-}: CarReservationPageProps) {
-    const { checkin, checkout } = searchParams
-    const car = await getCarBySlug(params.slug)
+    const [isPaymentLoading, setIsPaymentLoading] = useState<boolean>(false);
+    const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+    const {
+        data: car,
+        isCarLoading,
+        carError,
+    } = useQuery(getCarByHandle, { handle: slug! })
 
     // Validate required fields
     if (!car) {
@@ -50,6 +58,40 @@ export default function CarReservationPage({
     const subtotal = Number(car.pricePerDay) * days
     const taxes = subtotal * 0.16
     const currency = car.currency
+
+    const navigate = useNavigate();
+
+    async function handleRentNowClick() {
+        if (!user) {
+            navigate('/login');
+            return;
+        }
+        try {
+            setIsPaymentLoading(true);
+
+            const checkoutResults = await generateCarRentalCheckoutSession({
+                carId: car.id,
+                carName: car.name,
+                dailyRate: Number(car.pricePerDay),
+                durationDays: days,
+                currency: car.currency,
+            });
+
+            if (checkoutResults?.sessionUrl) {
+                window.open(checkoutResults.sessionUrl, '_self');
+            } else {
+                throw new Error('Error generating checkout session URL');
+            }
+        } catch (error: unknown) {
+            console.error(error);
+            if (error instanceof Error) {
+                setErrorMessage(error.message);
+            } else {
+                setErrorMessage('Error processing payment. Please try again later.');
+            }
+            setIsPaymentLoading(false); // We only set this to false here and not in the try block because we redirect to the checkout url within the same window
+        }
+    }
 
     return (
         <>
@@ -95,15 +137,17 @@ export default function CarReservationPage({
                             </div>
                             <Separator className="my-3 h-[6px]" />
                             <div className="px-5 py-3">
-                                <SignedOut>
+                                {!user ? (
                                     <AuthSection />
-                                </SignedOut>
-                                <SignedIn>
-                                    <PaymentDetails
-                                        amount={subtotal + taxes}
-                                        currency={currency}
-                                    />
-                                </SignedIn>
+                                ) : (
+                                    <Button
+                                        onClick={handleRentNowClick}
+                                        disabled={isPaymentLoading}
+                                        className="w-full py-3 text-lg font-semibold"
+                                    >
+                                        Pay KES {subtotal + taxes}
+                                    </Button>
+                                )}
                             </div>
                         </div>
                     </main>
@@ -136,15 +180,17 @@ export default function CarReservationPage({
                                             checkoutDate={checkoutDate}
                                         />
                                         <Separator className="my-7" />
-                                        <SignedOut>
+                                        {!user ? (
                                             <AuthSection />
-                                        </SignedOut>
-                                        <SignedIn>
-                                            <PaymentDetails
-                                                amount={subtotal + taxes}
-                                                currency={currency}
-                                            />
-                                        </SignedIn>
+                                        ) : (
+                                            <Button
+                                                onClick={handleRentNowClick}
+                                                disabled={isPaymentLoading}
+                                                className="w-full py-3 text-lg font-semibold"
+                                            >
+                                                Pay KES {subtotal + taxes}
+                                            </Button>
+                                        )}
                                     </div>
                                     <aside className="sticky top-[var(--site-header-height)] rounded-xl border">
                                         <div className="p-6">

@@ -1,11 +1,18 @@
 "use client"
 
-import { usePathname, useRouter, useSearchParams } from "next/navigation"
+import { useNavigate, useLocation } from 'react-router-dom'
 import { VariantProps } from "class-variance-authority"
+import * as React from "react"
+import { Button, buttonVariants } from "../../../components/ui/button"
 
-import { Button, buttonVariants } from "@/components/ui/button"
+// interface BackButtonProps extends VariantProps<typeof buttonVariants> {
+//     className?: string
+//     children?: React.ReactNode
+// }
 
-interface BackButtonProps extends VariantProps<typeof buttonVariants> {
+interface BackButtonProps
+    extends React.ButtonHTMLAttributes<HTMLButtonElement>,
+    VariantProps<typeof buttonVariants> {
     className?: string
     children?: React.ReactNode
 }
@@ -15,15 +22,15 @@ export function BackButton({
     size = "icon",
     className,
     children,
+    // ...props
 }: BackButtonProps) {
-    const router = useRouter()
-    const pathname = usePathname()
-    const searchParams = useSearchParams()
+    const navigate = useNavigate()
+    const location = useLocation()
 
     const handleRedirect = () => {
-        const updatedPath = pathname.replace("/reservation/cars", "/cars")
-        const targetUrl = `${updatedPath}?${searchParams.toString()}`
-        router.push(targetUrl)
+        const pathname = location.pathname.replace('/reservation/cars', '/cars')
+        const search = location.search // includes the existing ?query=params
+        navigate(`${pathname}${search}`)
     }
 
     return (

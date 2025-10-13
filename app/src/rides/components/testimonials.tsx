@@ -1,5 +1,4 @@
-import Image from "next/image"
-import { testimonials } from "@/data/testimonials"
+import { testimonials } from "../../data/testimonials"
 
 import {
     Carousel,
@@ -7,8 +6,8 @@ import {
     CarouselItem,
     CarouselNext,
     CarouselPrevious,
-} from "@/components/ui/carousel"
-import { FilledStarIcon } from "@/components/icons/filled-star"
+} from "../../components/ui/carousel"
+import { FilledStarIcon } from "../../components/icons/filled-star"
 
 export function Testimonials() {
     return (

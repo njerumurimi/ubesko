@@ -1,14 +1,16 @@
 import { ReactNode } from "react"
-import { getCars } from "@/db/queries/car-repository"
-
+import {
+    useQuery,
+    getCars
+} from 'wasp/client/operations';
 import { FiltersButton } from "./filters-button"
 
 interface FiltersProps {
     trigger?: ReactNode
 }
 
-export default async function Filters({ trigger }: FiltersProps) {
-    const cars = await getCars()
+export default function Filters({ trigger }: FiltersProps) {
+    const { data: cars, isLoading, error } = useQuery(getCars)
 
     const { MIN_PRICE, MAX_PRICE } = cars.reduce(
         (acc, car) => {

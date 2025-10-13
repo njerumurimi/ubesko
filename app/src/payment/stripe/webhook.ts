@@ -23,9 +23,10 @@ export const stripeWebhook: PaymentsWebhook = async (request, response, context)
     const rawStripeEvent = constructStripeEvent(request);
     const { eventName, data } = await parseWebhookPayload(rawStripeEvent);
     const prismaUserDelegate = context.entities.User;
+    const prismaCarRentalDelegate = context.entities.CarRental;
     switch (eventName) {
       case 'checkout.session.completed':
-        await handleCheckoutSessionCompleted(data, prismaUserDelegate);
+        await handleCheckoutSessionCompleted(data, prismaUserDelegate, prismaCarRentalDelegate);
         break;
       case 'invoice.paid':
         await handleInvoicePaid(data, prismaUserDelegate);
@@ -86,12 +87,66 @@ export const stripeMiddlewareConfigFn: MiddlewareConfigFn = (middlewareConfig) =
 // If so, use the checkout.session.async_payment_succeeded event to confirm the payment.
 async function handleCheckoutSessionCompleted(
   session: SessionCompletedData,
-  prismaUserDelegate: PrismaClient['user']
+  prismaUserDelegate: PrismaClient['user'],
+  prismaCarRentalDelegate: PrismaClient['carRental']
 ) {
   const isSuccessfulOneTimePayment = session.mode === 'payment' && session.payment_status === 'paid';
-  if (isSuccessfulOneTimePayment) {
+  // if (isSuccessfulOneTimePayment) {
+  //   await saveSuccessfulOneTimePayment(session, prismaUserDelegate);
+  // }
+  if (!isSuccessfulOneTimePayment) return;
+
+  // Fetch the line items to inspect what was purchased
+  const lineItems = await getCheckoutLineItemsBySessionId(session.id);
+  const lineItem = lineItems.data[0];
+  const productName = lineItem?.description || lineItem?.price?.product;
+
+  if (productName?.toLowerCase().includes('rental')) {
+    await saveSuccessfulCarRentalPayment(session, lineItems, prismaUserDelegate, prismaCarRentalDelegate);
+  } else {
     await saveSuccessfulOneTimePayment(session, prismaUserDelegate);
   }
+}
+
+async function saveSuccessfulCarRentalPayment(
+  session: SessionCompletedData,
+  lineItems: Stripe.ApiList<Stripe.LineItem>,
+  prismaUserDelegate: PrismaClient['user'],
+  prismaCarRentalDelegate?: PrismaClient['carRental']
+) {
+  const userStripeId = session.customer;
+  const item = lineItems.data[0];
+
+  const productName = item.description || 'Car Rental';
+  const totalAmount = item.amount_total ? item.amount_total / 100 : 0; // cents → dollars
+  const currency = item.currency || 'usd';
+
+  // ✅ Find the user by their Stripe customer ID
+  const user = await prismaUserDelegate.findFirst({
+    where: { paymentProcessorUserId: userStripeId },
+  });
+
+  if (!user) throw new Error(`User with Stripe ID ${userStripeId} not found`);
+
+  // ✅ Create a new CarRental record
+  await prismaCarRentalDelegate.create({
+    data: {
+      userId: user.id,
+      sessionId: session.id,
+      productName,
+      totalAmount,
+      currency,
+      datePaid: new Date(),
+    },
+  });
+
+  // Optionally email confirmation
+  // await emailSender.send({
+  //   to: user.email,
+  //   subject: `Your ${productName} is confirmed!`,
+  //   text: `Payment of ${currency.toUpperCase()} ${totalAmount} received.`,
+  //   html: `<p>Payment of ${currency.toUpperCase()} ${totalAmount} received.</p>`,
+  // });
 }
 
 async function saveSuccessfulOneTimePayment(

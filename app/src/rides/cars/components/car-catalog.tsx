@@ -17,7 +17,7 @@ interface CarCatalogProps {
     }
 }
 
-export default async function CarCatalog({ searchParams }: CarCatalogProps) {
+export default function CarCatalog({ searchParams }: CarCatalogProps) {
     const { data: cars, isLoading, error } = useQuery(getCars)
 
     const {

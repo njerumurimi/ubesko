@@ -53,6 +53,9 @@ const sessionCompletedDataSchema = z.object({
   customer: z.string(),
   payment_status: z.enum(['paid', 'unpaid', 'no_payment_required']),
   mode: z.enum(['payment', 'subscription']),
+  metadata: z.record(z.string(), z.string()).optional(), // ✅ optional metadata
+  amount_total: z.number().optional(), // ✅ Stripe adds this for total charge
+  currency: z.string().optional(), // ✅ for dynamic car rentals
 });
 
 /**

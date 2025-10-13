@@ -1,9 +1,17 @@
 import { SelectCar } from "@/db/schema"
+import { Car } from 'wasp/entities'
+import CldImage from "../../../components/cld-image"
+import { FilledStarIcon } from "../../../components/icons/filled-star"
 
-import CldImage from "@/components/cld-image"
-import { FilledStarIcon } from "@/components/icons/filled-star"
+interface CarCardProps {
+    car: Car
+}
 
-export function CarDetails({ car }: { car: SelectCar }) {
+export function CarDetails({ car }: CarCardProps) {
+    if (!car) {
+        return null
+    }
+
     return (
         <div className="grid grid-cols-1 gap-5 min-[360px]:flex">
             <div className="relative aspect-square w-[100px] shrink-0">

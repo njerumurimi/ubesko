@@ -1,5 +1,5 @@
-import { formatAmountForDisplay } from "@/lib/utils"
-import { Separator } from "@/components/ui/separator"
+import { formatAmountForDisplay } from "../../../lib/utils"
+import { Separator } from "../../../components/ui/separator"
 
 export function PriceDetails({
     days,

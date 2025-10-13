@@ -206,6 +206,11 @@ action generateCheckoutSession {
   entities: [User]
 }
 
+action generateCarRentalCheckoutSession {
+  fn: import { generateCarRentalCheckoutSession } from "@src/payment/operations",
+  entities: [User, CarRental]
+}
+
 api paymentsWebhook {
   fn: import { paymentsWebhook } from "@src/payment/webhook",
   entities: [User],

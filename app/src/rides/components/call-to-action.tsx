@@ -1,6 +1,6 @@
-import Link from "next/link"
+import { Link } from 'react-router-dom';
 
-import { Button } from "@/components/ui/button"
+import { Button } from "../../components/ui/button"
 
 export function CallToAction() {
     return (
@@ -13,7 +13,7 @@ export function CallToAction() {
                     </h2>
                     <div className="flex justify-start md:justify-end">
                         <Button className="rounded-[10px] px-4 py-0 text-[14px]" asChild>
-                            <Link href={"/cars"}>Explore Our Cars</Link>
+                            <Link to={"/cars"}>Explore Our Cars</Link>
                         </Button>
                     </div>
                 </div>

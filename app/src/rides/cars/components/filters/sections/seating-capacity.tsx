@@ -1,9 +1,7 @@
 import { Dispatch, SetStateAction, useState } from "react"
-
-import { Button } from "@/components/ui/button"
-import { MinusIcon } from "@/components/icons/minus"
-import { PlusIcon } from "@/components/icons/plus"
-
+import { Button } from "../../../../../components/ui/button"
+import { MinusIcon } from "../../../../../components/icons/minus"
+import { PlusIcon } from "../../../../../components/icons/plus"
 import { SelectedFilters } from "../types"
 
 interface SeatingCapacityFiltersProps {

@@ -1,7 +1,7 @@
-import { ClickIcon } from "@/components/icons/click"
-import { FilterSearchIcon } from "@/components/icons/filter-search"
-import { MapPinIcon } from "@/components/icons/map-pin"
-import { ShieldCheckIcon } from "@/components/icons/shield-check"
+import { ClickIcon } from "../../components/icons/click"
+import { FilterSearchIcon } from "../../components/icons/filter-search"
+import { MapPinIcon } from "../../components/icons/map-pin"
+import { ShieldCheckIcon } from "../../components/icons/shield-check"
 
 const features = [
     {

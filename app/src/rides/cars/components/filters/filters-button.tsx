@@ -8,14 +8,13 @@ import {
     useMemo,
     useState,
 } from "react"
-import { useRouter, useSearchParams } from "next/navigation"
-
-import { cn, constructUrlWithParams } from "@/lib/utils"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { FiltersIcon } from "@/components/icons/filters"
-import { ResponsiveModal } from "@/components/responsive-modal"
-
+import { useNavigate, useSearchParams } from 'react-router-dom'
+import { cn, constructUrlWithParams } from "../../../../lib/utils"
+import { Badge } from "../../../../components/ui/badge"
+import { Button } from "../../../../components/ui/button"
+import { FiltersIcon } from "../../../../components/icons/filters"
+import { ResponsiveModal } from "../../../../components/responsive-modal"
+import * as React from "react"
 import { FiltersContent } from "./filters-content"
 import {
     applyFiltersToParams,
@@ -35,8 +34,8 @@ export function FiltersButton({
     initialMaxPrice,
     trigger,
 }: FiltersButtonProps) {
-    const searchParams = useSearchParams()
-    const router = useRouter()
+    const navigate = useNavigate() // ✅ replaces useRouter
+    const [searchParams] = useSearchParams() // ✅ works the same
     const [isModalOpen, setIsModalOpen] = useState(false)
 
     const initialFilters = useMemo(
@@ -76,9 +75,9 @@ export function FiltersButton({
             initialMinPrice,
             initialMaxPrice
         )
-        router.push(constructUrlWithParams("/cars", newParams))
+        navigate(constructUrlWithParams('/cars', newParams))
         setIsModalOpen(false)
-    }, [searchParams, selectedFilters, initialMinPrice, initialMaxPrice, router])
+    }, [searchParams, selectedFilters, initialMinPrice, initialMaxPrice, navigate])
 
     const triggerWithBadge = useMemo(() => {
         const badge = totalSelectedFilters > 0 && (

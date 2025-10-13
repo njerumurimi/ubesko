@@ -10,6 +10,43 @@ export type CheckoutSession = {
   sessionId: string;
 };
 
+const generateCarRentalCheckoutSessionSchema = z.object({
+  carId: z.number(),
+  carName: z.string(),
+  durationDays: z.number().min(1),
+  dailyRate: z.number().min(0),
+  currency: z.string().default('usd'),
+});
+
+type GenerateCarRentalCheckoutSessionInput = z.infer<typeof generateCarRentalCheckoutSessionSchema>;
+
+export const generateCarRentalCheckoutSession: GenerateCheckoutSession<
+  GenerateCarRentalCheckoutSessionInput,
+  { sessionUrl: string | null; sessionId: string }
+> = async (rawArgs, context) => {
+  if (!context.user) {
+    throw new HttpError(401, 'You must be logged in to book a car.');
+  }
+
+  const userId = context.user.id;
+  const userEmail = context.user.email;
+  if (!userEmail) {
+    // If using the usernameAndPassword Auth method, switch to an Auth method that provides an email.
+    throw new HttpError(403, 'User needs an email to make a payment.');
+  }
+
+  const args = generateCarRentalCheckoutSessionSchema.parse(rawArgs);
+
+  const { session } = await paymentProcessor.createCarRentalCheckoutSession({
+    userId,
+    userEmail,
+    rentalDetails: args,
+    prismaUserDelegate: context.entities.User,
+  });
+
+  return { sessionUrl: session.url, sessionId: session.id };
+};
+
 const generateCheckoutSessionSchema = z.nativeEnum(PaymentPlanId);
 
 type GenerateCheckoutSessionInput = z.infer<typeof generateCheckoutSessionSchema>;

@@ -6,7 +6,6 @@ import { LogoLink } from "../../components/logoLink"
 import { SearchPanelWrapper } from "../../components/search-panel-wrapper"
 import { SearchPanelSkeleton } from "../../components/skeletons/search-panel"
 import { UserMenuButton } from "../../components/user-menu-button"
-
 import CarCatalog from "./components/car-catalog"
 import Filters from "./components/filters/filters-wrapper"
 import { CarCatalogSkeleton } from "./components/skeletons/car-catalog"
@@ -14,7 +13,7 @@ import { MapSkeleton } from "./components/skeletons/map"
 
 const Map = lazy(() => import("./components/map"))
 
-export default async function CarsPage({
+export default function CarsPage({
     searchParams,
 }: {
     searchParams: { [key: string]: string | string[] | undefined }
