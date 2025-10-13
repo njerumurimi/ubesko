@@ -309,3 +309,47 @@ page AdminMessagesPage {
   component: import AdminMessages from "@src/admin/dashboards/messages/MessagesPage"
 }
 //#endregion
+
+//#region Rides
+
+// --- Pages ---
+route RidesRoute { path: "/rides", to: RidesPage }
+page RidesPage {
+  authRequired: true,
+  component: import RidesPage from "@src/rides/RidesPage"
+}
+
+route CarsRoute { path: "/cars", to: CarsPage }
+page CarsPage {
+  authRequired: true,
+  component: import CarsPage from "@src/rides/cars/CarsPage"
+}
+
+route CarReservationRoute { path: "/reservation", to: CarReservationPage }
+page CarReservationPage {
+  authRequired: true,
+  component: import CarReservationPage from "@src/rides/reservation/CarReservationPage"
+}
+
+// --- Queries ---
+query getCars {
+  fn: import { getCars } from "@src/rides/cars/operations",
+  entities: [Car]
+}
+
+query getCarByHandle {
+  fn: import { getCarByHandle } from "@src/rides/cars/operations",
+  entities: [Car]
+}
+
+query getCarImage {
+  fn: import { getCarImage } from "@src/rides/cars/operations",
+  entities: [File]
+}
+
+query getLocations {
+  fn: import { getLocations } from "@src/rides/reservation/operations",
+  entities: [Location]
+}
+
+//#endregion

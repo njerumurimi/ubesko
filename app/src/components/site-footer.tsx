@@ -1,4 +1,4 @@
-import { siteConfig } from "@/config/site"
+import { siteConfig } from "../landing-page/config"
 
 import { LogoLink } from "./logoLink"
 import { Button } from "./ui/button"

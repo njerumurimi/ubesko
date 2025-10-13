@@ -1,4 +1,4 @@
-import type { Location } from '@wasp/entities'
+import type { Location } from 'wasp/entities'
 import { HttpError } from 'wasp/server';
 import type {
     GetLocations

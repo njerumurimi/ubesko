@@ -1,5 +1,5 @@
 import * as z from 'zod';
-import type { GenerateCheckoutSession, GetCustomerPortalUrl } from 'wasp/server/operations';
+import type { GenerateCheckoutSession, GenerateCarRentalCheckoutSession, GetCustomerPortalUrl } from 'wasp/server/operations';
 import { PaymentPlanId, paymentPlans } from '../payment/plans';
 import { paymentProcessor } from './paymentProcessor';
 import { HttpError } from 'wasp/server';
@@ -20,7 +20,7 @@ const generateCarRentalCheckoutSessionSchema = z.object({
 
 type GenerateCarRentalCheckoutSessionInput = z.infer<typeof generateCarRentalCheckoutSessionSchema>;
 
-export const generateCarRentalCheckoutSession: GenerateCheckoutSession<
+export const generateCarRentalCheckoutSession: GenerateCarRentalCheckoutSession<
   GenerateCarRentalCheckoutSessionInput,
   { sessionUrl: string | null; sessionId: string }
 > = async (rawArgs, context) => {

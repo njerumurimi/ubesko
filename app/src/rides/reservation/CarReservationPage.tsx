@@ -32,13 +32,18 @@ export default function CarReservationPage() {
 
     const {
         data: car,
-        isCarLoading,
-        carError,
+        isLoading: isCarLoading,
+        error: carError,
     } = useQuery(getCarByHandle, { handle: slug! })
 
     // Validate required fields
     if (!car) {
         throw new Error("Car is missing")
+    }
+
+
+    if (!checkin || !checkout) {
+        throw new Error("Missing check-in or check-out dates")
     }
 
     // Validate date fields
@@ -66,6 +71,12 @@ export default function CarReservationPage() {
             navigate('/login');
             return;
         }
+
+        if (!car) {
+            setErrorMessage("Car details not available");
+            return;
+        }
+
         try {
             setIsPaymentLoading(true);
 

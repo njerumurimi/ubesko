@@ -1,5 +1,5 @@
-import { Separator } from "@/components/ui/separator"
-import { Skeleton } from "@/components/ui/skeleton"
+import { Separator } from "../ui/separator"
+import { Skeleton } from "../ui/skeleton"
 
 export function SearchPanelSkeleton() {
     return (

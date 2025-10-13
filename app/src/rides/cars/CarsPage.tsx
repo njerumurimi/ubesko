@@ -10,14 +10,23 @@ import CarCatalog from "./components/car-catalog"
 import Filters from "./components/filters/filters-wrapper"
 import { CarCatalogSkeleton } from "./components/skeletons/car-catalog"
 import { MapSkeleton } from "./components/skeletons/map"
+import { useSearchParams } from 'react-router-dom'
+import { SearchParams } from "../../lib/types"
 
 const Map = lazy(() => import("./components/map"))
 
-export default function CarsPage({
-    searchParams,
-}: {
-    searchParams: { [key: string]: string | string[] | undefined }
-}) {
+export default function CarsPage() {
+    const [params] = useSearchParams()
+
+    const searchParams = {
+        [SearchParams.MIN_PRICE]: params.get(SearchParams.MIN_PRICE) || undefined,
+        [SearchParams.MAX_PRICE]: params.get(SearchParams.MAX_PRICE) || undefined,
+        [SearchParams.BODY_STYLE]: params.getAll(SearchParams.BODY_STYLE),
+        [SearchParams.POWERTRAIN]: params.get(SearchParams.POWERTRAIN) || undefined,
+        [SearchParams.TRANSMISSION]: params.getAll(SearchParams.TRANSMISSION),
+        [SearchParams.MIN_SEATS]: params.get(SearchParams.MIN_SEATS) || undefined,
+    }
+
     return (
         <div className="[--site-header-height:100px] md:[--site-header-height:170px]">
             <header className="sticky top-0 z-40 h-[var(--site-header-height)] border-b border-black/10 bg-white">

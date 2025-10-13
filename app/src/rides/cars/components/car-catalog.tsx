@@ -29,7 +29,7 @@ export default function CarCatalog({ searchParams }: CarCatalogProps) {
         [SearchParams.MIN_SEATS]: minSeats,
     } = searchParams
 
-    const filteredCars = cars.filter((car) => {
+    const filteredCars = cars?.filter((car) => {
         return (
             (!minPrice || Number(car.pricePerDay) >= Number(minPrice)) &&
             (!maxPrice || Number(car.pricePerDay) <= Number(maxPrice)) &&
@@ -40,7 +40,7 @@ export default function CarCatalog({ searchParams }: CarCatalogProps) {
         )
     })
 
-    if (!filteredCars.length)
+    if (!filteredCars?.length)
         return (
             <div className="col-span-full text-balance">
                 <h1 className="text-xl font-semibold">No exact matches</h1>

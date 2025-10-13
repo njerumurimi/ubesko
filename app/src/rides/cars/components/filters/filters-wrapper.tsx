@@ -12,7 +12,7 @@ interface FiltersProps {
 export default function Filters({ trigger }: FiltersProps) {
     const { data: cars, isLoading, error } = useQuery(getCars)
 
-    const { MIN_PRICE, MAX_PRICE } = cars.reduce(
+    const { MIN_PRICE, MAX_PRICE } = (cars ?? []).reduce(
         (acc, car) => {
             acc.MIN_PRICE = Math.min(acc.MIN_PRICE, Number(car.pricePerDay))
             acc.MAX_PRICE = Math.max(acc.MAX_PRICE, Number(car.pricePerDay))

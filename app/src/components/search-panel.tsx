@@ -1,13 +1,13 @@
 "use client"
 
-import { useEffect, useState } from "react"
-import { useRouter, useSearchParams } from "next/navigation"
-import { SelectLocation } from "@/db/schema"
+import { useState, useEffect } from "react"
+import { useNavigate, useSearchParams } from "react-router-dom"
+import type { Location } from 'wasp/entities'
 import { addDays, format, isBefore } from "date-fns"
 
-import { SearchParams } from "@/lib/types"
-import { Button } from "@/components/ui/button"
-import { Calendar } from "@/components/ui/calendar"
+import { SearchParams } from "../lib/types"
+import { Button } from "./ui/button"
+import { Calendar } from "./ui/calendar"
 import {
   Command,
   CommandEmpty,
@@ -15,22 +15,23 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
-} from "@/components/ui/command"
+} from "./ui/command"
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/components/ui/popover"
-import { Separator } from "@/components/ui/separator"
-import { CheckIcon } from "@/components/icons/check"
-import { SearchIcon } from "@/components/icons/search"
-import { SelectorIcon } from "@/components/icons/selector"
+} from "./ui/popover"
+import { Separator } from "./ui/separator"
+import { CheckIcon } from "./icons/check"
+import { SearchIcon } from "./icons/search"
+import { SelectorIcon } from "./icons/selector"
+import * as React from "react"
 
 import { cn, constructUrlWithParams } from "../lib/utils"
 
-export function SearchPanel({ locations }: { locations: SelectLocation[] }) {
-  const { push } = useRouter()
-  const searchParams = useSearchParams()
+export function SearchPanel({ locations }: { locations: Location[] }) {
+  const navigate = useNavigate()  // replaces `const { push } = useRouter()`
+  const [searchParams, setSearchParams] = useSearchParams()
 
   const [open, setOpen] = useState(false)
   const [location, setLocation] = useState("")
@@ -83,7 +84,7 @@ export function SearchPanel({ locations }: { locations: SelectLocation[] }) {
     if (location) {
       newParams.set(SearchParams.LOCATION, location)
 
-      const currentLocation = locations.find((loc) => loc.slug === location)
+      const currentLocation = locations.find((loc) => loc.handle === location)
       if (currentLocation) {
         newParams.set(SearchParams.LAT, currentLocation.latitude.toString())
         newParams.set(SearchParams.LNG, currentLocation.longitude.toString())
@@ -97,7 +98,7 @@ export function SearchPanel({ locations }: { locations: SelectLocation[] }) {
     if (checkoutISOString)
       newParams.set(SearchParams.CHECKOUT, checkoutISOString)
 
-    push(constructUrlWithParams("/cars", newParams))
+    navigate(constructUrlWithParams("/cars", newParams))
   }
 
   return (
@@ -127,7 +128,7 @@ export function SearchPanel({ locations }: { locations: SelectLocation[] }) {
                           {location ? (
                             <p className="truncate font-semibold text-neutral-800">
                               {
-                                locations.find((loc) => loc.slug === location)
+                                locations.find((loc) => loc.handle === location)
                                   ?.name
                               }
                             </p>
@@ -150,7 +151,7 @@ export function SearchPanel({ locations }: { locations: SelectLocation[] }) {
                           {locations.map((loc) => (
                             <CommandItem
                               key={loc.id}
-                              value={loc.slug}
+                              value={loc.handle}
                               onSelect={(currentValue) => {
                                 setLocation(
                                   currentValue === location ? "" : currentValue
@@ -161,7 +162,7 @@ export function SearchPanel({ locations }: { locations: SelectLocation[] }) {
                               <CheckIcon
                                 className={cn(
                                   "mr-2 size-4 shrink-0",
-                                  location === loc.slug
+                                  location === loc.handle
                                     ? "opacity-100"
                                     : "opacity-0"
                                 )}

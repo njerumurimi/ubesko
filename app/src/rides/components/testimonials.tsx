@@ -1,5 +1,4 @@
 import { testimonials } from "../../data/testimonials"
-
 import {
     Carousel,
     CarouselContent,
@@ -49,7 +48,7 @@ export function Testimonials() {
                                                 <div className="pt-8">
                                                     {/* Reviewer Information */}
                                                     <figcaption className="flex items-center gap-2.5">
-                                                        <Image
+                                                        <img
                                                             src={imageUrl}
                                                             alt={name}
                                                             className="size-6 shrink-0 rounded-full object-cover"

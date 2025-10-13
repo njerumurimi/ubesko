@@ -1,12 +1,13 @@
 import { Car } from 'wasp/entities'
 import { formatAmountForDisplay } from "../../../lib/utils"
-import CldImage from "../../../components/cld-image"
 import { AutomaticGearboxIcon } from "../../../components/icons/automatic-gearbox"
 import { BatteryAutomotiveIcon } from "../../../components/icons/battery-automotive"
 import { EngineIcon } from "../../../components/icons/engine"
 import { FilledStarIcon } from "../../../components/icons/filled-star"
 import { ManualGearboxIcon } from "../../../components/icons/manual-gearbox"
 import { CarDetailsButton } from "./car-details-button"
+import { useEffect, useState } from 'react'
+import { getCarImage, getDownloadFileSignedURL } from 'wasp/client/operations'
 
 interface CarCardProps {
     car: Car
@@ -17,16 +18,77 @@ export function CarCard({ car }: CarCardProps) {
         return null
     }
 
+    const [imageKeys, setImageKeys] = useState<{ [uploadUrl: string]: string }>({})
+    const [imageUrlsMap, setImageUrlsMap] = useState<{ [uploadUrl: string]: string }>({})
+
+    const fetchImageKeys = async (uploadUrls: string[]) => {
+        try {
+            const keyPromises = uploadUrls.map(async (uploadUrl) => {
+                const { images } = await getCarImage({ imageUrl: uploadUrl }) // server query: find File by uploadUrl
+                return images.length > 0 ? { uploadUrl, key: images[0].key } : null
+            })
+
+            const results = await Promise.allSettled(keyPromises)
+            const keyArray = results
+                .filter((r): r is PromiseFulfilledResult<{ uploadUrl: string; key: string }> => r.status === 'fulfilled' && r.value !== null)
+                .map((r) => r.value)
+
+            setImageKeys((prev) => ({
+                ...prev,
+                ...Object.fromEntries(keyArray.map(({ uploadUrl, key }) => [uploadUrl, key])),
+            }))
+
+            // Now fetch signed URLs
+            fetchSignedUrls(keyArray)
+        } catch (err) {
+            console.error('Error resolving image keys', err)
+        }
+    }
+
+    const fetchSignedUrls = async (keyArray: { uploadUrl: string; key: string }[]) => {
+        try {
+            const urlPromises = keyArray.map(async ({ uploadUrl, key }) => {
+                const signedUrl = await getDownloadFileSignedURL({ key })
+                return { uploadUrl, url: signedUrl }
+            })
+
+            const results = await Promise.allSettled(urlPromises)
+            const urlArray = results
+                .filter((r): r is PromiseFulfilledResult<{ uploadUrl: string; url: string }> => r.status === 'fulfilled')
+                .map((r) => r.value)
+
+            setImageUrlsMap((prev) => ({
+                ...prev,
+                ...Object.fromEntries(urlArray.map(({ uploadUrl, url }) => [uploadUrl, url])),
+            }))
+        } catch (err) {
+            console.error('Error fetching signed URLs', err)
+        }
+    }
+
+    // Trigger when products change
+    useEffect(() => {
+
+        if (!car?.imageUrl) return
+
+        const uploadUrls = [car.imageUrl].filter(
+            (u: string): u is string => !!u && !imageKeys[u]
+        )
+
+        if (uploadUrls.length > 0) {
+            fetchImageKeys(uploadUrls)
+        }
+    }, [car?.imageUrl])
+
+    const signedUrl = car.imageUrl ? imageUrlsMap[car.imageUrl] : null
+
     return (
         <article className="overflow-hidden rounded-[10px] border border-black/[0.08] bg-white text-sm shadow-sm">
             <div className="relative aspect-video h-40 w-full">
-                <CldImage
-                    src={car.imageUrl}
+                <img
+                    src={signedUrl ?? ''}
                     alt={car.name}
-                    fill
                     className="object-cover"
-                    sizes="(max-width: 569px) 100vw, (max-width: 840px) 50vw, (max-width: 949px) 33vw, (max-width: 1036px) 60vw, (max-width: 1336px) 30vw, 300px"
-                    priority
                 />
             </div>
             <div className="flex flex-col gap-1.5 p-5">
@@ -35,7 +97,7 @@ export function CarCard({ car }: CarCardProps) {
                     <div className="inline-flex shrink-0 items-center justify-center gap-x-1">
                         <FilledStarIcon className="inline size-3 shrink-0 " />
                         <span className="leading-none">
-                            <span className="font-medium">{car.rating}</span>{" "}
+                            <span className="font-medium">{Number(car.rating).toFixed(1)}</span>{" "}
                             <span className="text-neutral-600">
                                 {Number(car.reviewCount) > 0 && `(${car.reviewCount})`}
                             </span>
@@ -71,7 +133,7 @@ export function CarCard({ car }: CarCardProps) {
                     <span className="ml-1 leading-none text-neutral-900">day</span>
                 </div>
                 <div className="pt-4">
-                    <CarDetailsButton carSlug={car.slug} />
+                    <CarDetailsButton carSlug={car.handle} />
                 </div>
             </div>
         </article>

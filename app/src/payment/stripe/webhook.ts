@@ -99,7 +99,12 @@ async function handleCheckoutSessionCompleted(
   // Fetch the line items to inspect what was purchased
   const lineItems = await getCheckoutLineItemsBySessionId(session.id);
   const lineItem = lineItems.data[0];
-  const productName = lineItem?.description || lineItem?.price?.product;
+  // const productName = lineItem?.description || lineItem?.price?.product;
+  const productNameRaw = lineItem?.description || lineItem?.price?.product;
+  const productName =
+    typeof productNameRaw === 'string'
+      ? productNameRaw
+      : (productNameRaw as Stripe.Product)?.name ?? 'Unknown Product';
 
   if (productName?.toLowerCase().includes('rental')) {
     await saveSuccessfulCarRentalPayment(session, lineItems, prismaUserDelegate, prismaCarRentalDelegate);
@@ -112,7 +117,7 @@ async function saveSuccessfulCarRentalPayment(
   session: SessionCompletedData,
   lineItems: Stripe.ApiList<Stripe.LineItem>,
   prismaUserDelegate: PrismaClient['user'],
-  prismaCarRentalDelegate?: PrismaClient['carRental']
+  prismaCarRentalDelegate: PrismaClient['carRental']
 ) {
   const userStripeId = session.customer;
   const item = lineItems.data[0];

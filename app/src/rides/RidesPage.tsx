@@ -6,7 +6,7 @@ import { Hero } from "./components/hero"
 import { PopularDestinations } from "./components/popular-destinations"
 import { Testimonials } from "./components/testimonials"
 
-export default function HomePage() {
+export default function RidesPage() {
     return (
         <>
             <div className="sticky top-0 z-40 bg-[hsla(0,0%,100%,.8)] shadow-[inset_0_-1px_0_0_#eaeaea] backdrop-blur-[5px] backdrop-saturate-[1.8]">

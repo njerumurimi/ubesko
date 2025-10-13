@@ -149,8 +149,8 @@ model Car {
 
 model CarRental {
   id          Int      @id @default(autoincrement())
-  user        User     @relation(fields: [userId], references: [id])
-  userId      Int
+  user        User     @relation("UserCarRentals", fields: [userId], references: [id])
+  userId      String
   sessionId   String   @unique
   productName String
   totalAmount Float
