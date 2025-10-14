@@ -17,13 +17,14 @@ import {
   type SubscriptionUpdatedData,
 } from './webhookPayload';
 import { UnhandledWebhookEventError } from '../errors';
+import { prisma } from '../../db/prisma';
 
 export const stripeWebhook: PaymentsWebhook = async (request, response, context) => {
   try {
     const rawStripeEvent = constructStripeEvent(request);
     const { eventName, data } = await parseWebhookPayload(rawStripeEvent);
     const prismaUserDelegate = context.entities.User;
-    const prismaCarRentalDelegate = context.entities.CarRental;
+    const prismaCarRentalDelegate = prisma.carRental;
     switch (eventName) {
       case 'checkout.session.completed':
         await handleCheckoutSessionCompleted(data, prismaUserDelegate, prismaCarRentalDelegate);
